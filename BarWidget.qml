@@ -144,7 +144,7 @@ BarWidget {
     function toggle(): void { root.togglePanel() }
   }
 
-  // Glass Clock: when the minute (or the format) changes, the old time lifts
+  // Island Clock: when the minute (or the format) changes, the old time lifts
   // away and the new one rises in, instead of the text just swapping.
   property string shownText: ""
   onDisplayTextChanged: {

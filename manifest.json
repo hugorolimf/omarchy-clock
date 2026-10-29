@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "io.github.hugorolimf.clock",
-  "name": "Glass Clock",
+  "name": "Island Clock",
   "author": "Hugo Rolim Filho",
   "license": "MIT",
   "homepage": "https://github.com/hugorolimf/omarchy-clock",
@@ -13,7 +13,7 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Glass Clock",
+    "displayName": "Island Clock",
     "description": "Date and time with a flip animation and calendar",
     "category": "Time",
     "allowMultiple": false

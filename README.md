@@ -1,15 +1,15 @@
 <div align="center">
 
-# Glass Clock
+# Island Clock
 
 **A clock that ticks over instead of blinking.**
 Quiet date, bright time, and every minute flips in.
 
-![Glass Clock flipping to the next minute](assets/flip.gif)
+![Island Clock flipping to the next minute](assets/flip.gif)
 
 </div>
 
-![Glass Clock in the Omarchy bar](preview.png)
+![Island Clock in the Omarchy bar](preview.png)
 
 ## Why this one
 
@@ -31,7 +31,7 @@ Quiet date, bright time, and every minute flips in.
 omarchy plugin add https://github.com/hugorolimf/omarchy-clock --enable
 ```
 
-Works with Omarchy's own bar and with [Glass Bar](https://github.com/hugorolimf/omarchy-bar).
+Works with Omarchy's own bar and with Island Bar (coming soon).
 
 ## Requirements
 
