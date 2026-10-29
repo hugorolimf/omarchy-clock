@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.hugorolimf.clock",
+  "name": "Glass Clock",
+  "author": "Hugo Rolim Filho",
+  "license": "MIT",
+  "homepage": "https://github.com/hugorolimf/omarchy-clock",
+  "description": "A two-tone clock for the Omarchy bar: a quiet monospaced date beside a bright time whose minutes flip in, in your system language, with Omarchy's full calendar panel",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Glass Clock",
+    "description": "Date and time with a flip animation and calendar",
+    "category": "Time",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.clock"
+  },
+  "version": "1.0.0"
+}
