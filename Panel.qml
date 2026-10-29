@@ -2,8 +2,9 @@ import QtQuick
 import Quickshell
 import qs.Commons
 import qs.Commons as Commons
-import qs.Ui
+import "../io.github.hugorolimf.kit/ui"
 import "Model.js" as Model
+import "Strings.js" as Strings
 
 // The clock's calendar popup: a month grid with ISO week numbers, built to
 // sit beside the weather panel — same hero-over-detail composition, same
@@ -67,16 +68,10 @@ Panel {
   // convention. Clicking the grid's "W" heading writes the choice back to
   // shell.json.
   readonly property int weekStart: Model.normalizedWeekStart(setting("weekStartDay", null), Qt.locale().firstDayOfWeek)
-  // The interface is English throughout, so day names are not taken from the
-  // system locale. Where the week starts still is: that is a regional
-  // convention rather than a translation, and it stays overridable above.
+  // Day and month names are always Portuguese. Where the week starts still
+  // follows the system locale: that is a regional convention rather than a
+  // translation, and it stays overridable above.
   readonly property var labelLocale: Qt.locale()
-  // Portuguese is the source language; anything else gets Omarchy's English.
-  readonly property bool portuguese: labelLocale.name.indexOf("pt") === 0
-  readonly property var english: ({ "Voltar para hoje": "Back to today", "NASCIMENTO": "BORN", "ano": "year",
-    "ATÉ OS": "LIVE TO", "VIDA": "LIFE", "S": "W", "Começar a semana em ": "Start weeks on ",
-    "Mês anterior": "Previous month", "Próximo mês": "Next month" })
-  function tr(text) { return portuguese ? text : (english[text] || text) }
   readonly property string nextWeekStartLabel: labelLocale.dayName(Model.toggledWeekStart(weekStart), Locale.LongFormat)
   readonly property var weekdays: Model.weekdayOrder(weekStart)
   readonly property var weeks: Model.monthGrid(viewYear, viewMonth, weekStart, todayKey)
@@ -228,7 +223,7 @@ Panel {
     setWeekStart(Model.toggledWeekStart(root.weekStart))
   }
 
-  // English short day names, matching the rest of the interface.
+  // Portuguese short day names ("SEG"), without the locale's trailing dot.
   function weekdayLabel(weekday) {
     return String(labelLocale.dayName(weekday, Locale.ShortFormat)).replace(".", "").toUpperCase()
   }
@@ -302,35 +297,32 @@ Panel {
             Row {
               id: heroRow
               anchors.horizontalCenter: parent.horizontalCenter
-              spacing: Style.space(22)
+              spacing: Style.space(16)
 
-              Text {
-                // Baseline-aligned, not center-aligned: "July 26" carries a
-                // descender, so centering the two boxes leaves the icon
-                // sitting visibly low against the digits.
-                anchors.baseline: heroDate.baseline
-                text: "󰃭"
-                color: heroMouse.containsMouse
-                  ? Style.hoverStateColor(root.contentForeground, Commons.Color.accent)
-                  : root.contentForeground
-                font.family: root.contentFontFamily
-                // Decorative, and deliberately outside the Style.font.*
-                // scale. Sized so the glyph reads at the cap height of the
-                // date beside it rather than towering over it.
-                font.pixelSize: 48
+              // Stroke calendar sized to the cap height of the date, so it
+              // reads as part of the line rather than towering over it.
+              AnatomyIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                path: Anatomy.icons.calendar
+                size: Math.round(Style.space(34))
+                strokeWidth: 1.1
+                color: heroMouse.containsMouse ? Anatomy.blue : Anatomy.hi
+
+                Behavior on color { ColorAnimation { duration: Anatomy.fast } }
               }
 
               Text {
                 id: heroDate
                 textFormat: Text.PlainText
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.today.toLocaleDateString(root.labelLocale, root.portuguese ? "d 'de' MMMM" : "MMMM d")
-                color: heroMouse.containsMouse
-                  ? Style.hoverStateColor(root.contentForeground, Commons.Color.accent)
-                  : root.contentForeground
-                font.family: root.contentFontFamily
-                font.pixelSize: 52
-                font.bold: true
+                text: root.today.toLocaleDateString(root.labelLocale, Strings.english ? "MMMM d" : "d 'de' MMMM")
+                color: heroMouse.containsMouse ? Anatomy.blue : Anatomy.strong
+                font.family: Anatomy.sans
+                // Hero read-out, deliberately outside the Style.font.* scale.
+                font.pixelSize: Math.round(Style.space(40))
+                font.weight: Font.Light
+
+                Behavior on color { ColorAnimation { duration: Anatomy.fast } }
               }
             }
 
@@ -347,8 +339,7 @@ Panel {
 
               PanelToolTip {
                 visible: heroMouse.containsMouse
-                text: root.tr("Voltar para hoje")
-                fontFamily: root.contentFontFamily
+                text: Strings.T("Voltar para hoje")
               }
             }
           }
@@ -372,6 +363,16 @@ Panel {
                 onDoubleTapped: root.startEditingLife()
               }
 
+              HoverHandler {
+                id: yearHover
+                enabled: !root.editingLife
+              }
+
+              PanelToolTip {
+                visible: yearHover.hovered && !root.editingLife
+                text: root.yearDonePercent + Strings.T("% de ") + root.today.getFullYear() + Strings.T(" já passou · dois cliques para o Memento Mori")
+              }
+
               Row {
                 visible: root.editingLife
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -380,20 +381,21 @@ Panel {
 
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
-                  text: root.tr("NASCIMENTO")
-                  color: Qt.darker(root.contentForeground, 1.5)
-                  font.family: root.contentFontFamily
-                  font.pixelSize: Style.font.bodySmall
-                  font.letterSpacing: 1
+                  text: Strings.T("NASCIMENTO")
+                  color: Anatomy.muted
+                  font.family: Anatomy.mono
+                  font.pixelSize: Style.font.caption
+                  font.weight: Font.DemiBold
+                  font.letterSpacing: Anatomy.labelSpacing
                 }
 
                 TextField {
                   id: bornField
                   width: Style.space(70)
                   anchors.verticalCenter: parent.verticalCenter
-                  placeholderText: root.tr("ano")
+                  placeholderText: Strings.T("ano")
                   foreground: root.contentForeground
-                  font.family: root.contentFontFamily
+                  font.family: Anatomy.mono
                   inputMethodHints: Qt.ImhDigitsOnly
 
                   Keys.onPressed: function(event) { root.handleLifeKey(event, expectancyField) }
@@ -403,11 +405,12 @@ Panel {
                   anchors.verticalCenter: parent.verticalCenter
                   anchors.verticalCenterOffset: 0
                   leftPadding: Style.space(6)
-                  text: root.tr("ATÉ OS")
-                  color: Qt.darker(root.contentForeground, 1.5)
-                  font.family: root.contentFontFamily
-                  font.pixelSize: Style.font.bodySmall
-                  font.letterSpacing: 1
+                  text: Strings.T("ATÉ OS")
+                  color: Anatomy.muted
+                  font.family: Anatomy.mono
+                  font.pixelSize: Style.font.caption
+                  font.weight: Font.DemiBold
+                  font.letterSpacing: Anatomy.labelSpacing
                 }
 
                 TextField {
@@ -416,7 +419,7 @@ Panel {
                   anchors.verticalCenter: parent.verticalCenter
                   placeholderText: "90"
                   foreground: root.contentForeground
-                  font.family: root.contentFontFamily
+                  font.family: Anatomy.mono
                   inputMethodHints: Qt.ImhDigitsOnly
 
                   Keys.onPressed: function(event) { root.handleLifeKey(event, bornField) }
@@ -430,10 +433,11 @@ Panel {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.today.getFullYear()
-                color: Qt.darker(root.contentForeground, 1.5)
-                font.family: root.contentFontFamily
-                font.pixelSize: Style.font.bodySmall
-                font.letterSpacing: 1
+                color: Anatomy.muted
+                font.family: Anatomy.mono
+                font.pixelSize: Style.font.caption
+                font.weight: Font.DemiBold
+                font.letterSpacing: Anatomy.labelSpacing
               }
 
               Text {
@@ -443,9 +447,10 @@ Panel {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.yearDonePercent + "%"
-                color: root.contentForeground
-                font.family: root.contentFontFamily
+                color: Anatomy.strong
+                font.family: Anatomy.mono
                 font.pixelSize: Style.font.bodySmall
+                font.weight: Font.Medium
               }
 
               Rectangle {
@@ -456,17 +461,17 @@ Panel {
                 anchors.leftMargin: Style.space(12)
                 anchors.rightMargin: Style.space(12)
                 anchors.verticalCenter: parent.verticalCenter
-                height: Style.space(6)
-                radius: Style.cornerRadius > 0 ? height / 2 : 0
-                color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.12)
+                height: Anatomy.trackHeight
+                radius: height / 2
+                color: Anatomy.faint
 
                 Rectangle {
                   width: Math.round(parent.width * root.yearDone)
                   height: parent.height
                   radius: parent.radius
-                  color: Style.selectedStateColor(root.contentForeground, Commons.Color.accent)
+                  color: Anatomy.hi
 
-                  Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                  Behavior on width { NumberAnimation { duration: Anatomy.base; easing.type: Easing.Bezier; easing.bezierCurve: Anatomy.ease } }
                 }
               }
             }
@@ -490,11 +495,12 @@ Panel {
                 id: lifeLabel
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.tr("VIDA")
-                color: Qt.darker(root.contentForeground, 1.5)
-                font.family: root.contentFontFamily
-                font.pixelSize: Style.font.bodySmall
-                font.letterSpacing: 1
+                text: Strings.T("VIDA")
+                color: Anatomy.muted
+                font.family: Anatomy.mono
+                font.pixelSize: Style.font.caption
+                font.weight: Font.DemiBold
+                font.letterSpacing: Anatomy.labelSpacing
               }
 
               Text {
@@ -503,9 +509,10 @@ Panel {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.lifeDonePercent + "%"
-                color: root.contentForeground
-                font.family: root.contentFontFamily
+                color: Anatomy.strong
+                font.family: Anatomy.mono
                 font.pixelSize: Style.font.bodySmall
+                font.weight: Font.Medium
               }
 
               Rectangle {
@@ -514,17 +521,17 @@ Panel {
                 anchors.leftMargin: Style.space(12)
                 anchors.rightMargin: Style.space(12)
                 anchors.verticalCenter: parent.verticalCenter
-                height: Style.space(6)
-                radius: Style.cornerRadius > 0 ? height / 2 : 0
-                color: Qt.rgba(root.contentForeground.r, root.contentForeground.g, root.contentForeground.b, 0.12)
+                height: Anatomy.trackHeight
+                radius: height / 2
+                color: Anatomy.faint
 
                 Rectangle {
                   width: Math.round(parent.width * root.lifeDone)
                   height: parent.height
                   radius: parent.radius
-                  color: Style.selectedStateColor(root.contentForeground, Commons.Color.accent)
+                  color: Anatomy.hi
 
-                  Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                  Behavior on width { NumberAnimation { duration: Anatomy.base; easing.type: Easing.Bezier; easing.bezierCurve: Anatomy.ease } }
                 }
               }
 
@@ -540,8 +547,7 @@ Panel {
 
                 PanelToolTip {
                   visible: lifeMouse.containsMouse
-                  text: "Memento Mori"
-                  fontFamily: root.contentFontFamily
+                  text: "Memento Mori · " + root.age + Strings.T(" de ") + root.lifeExpectancy + Strings.T(" anos · dois cliques para esconder")
                 }
               }
             }
@@ -582,21 +588,17 @@ Panel {
                 Rectangle {
                   width: root.weekColumnWidth
                   height: Style.space(16)
-                  radius: Style.cornerRadius
-                  color: weekStartMouse.containsMouse
-                    ? Style.hoverFillFor(root.contentForeground, Commons.Color.accent)
-                    : "transparent"
+                  radius: Anatomy.chipRadius
+                  color: weekStartMouse.containsMouse ? Anatomy.hover : "transparent"
 
                   Text {
                     anchors.centerIn: parent
-                    text: root.tr("S")
-                    color: weekStartMouse.containsMouse
-                      ? Style.hoverStateColor(root.contentForeground, Commons.Color.accent)
-                      : Qt.darker(root.contentForeground, 1.9)
-                    font.family: root.contentFontFamily
+                    text: Strings.T("S")
+                    color: weekStartMouse.containsMouse ? Anatomy.strong : Anatomy.lo
+                    font.family: Anatomy.mono
                     font.pixelSize: Style.font.caption
-                    font.letterSpacing: 1
-                    font.bold: true
+                    font.weight: Font.DemiBold
+                    font.letterSpacing: Anatomy.labelSpacing
                   }
 
                   MouseArea {
@@ -609,8 +611,7 @@ Panel {
 
                   PanelToolTip {
                     visible: weekStartMouse.containsMouse
-                    text: root.tr("Começar a semana em ") + root.nextWeekStartLabel
-                    fontFamily: root.contentFontFamily
+                    text: Strings.T("Coluna S = número da semana · clique para começar a semana em ") + root.nextWeekStartLabel
                   }
                 }
 
@@ -630,11 +631,11 @@ Panel {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     text: root.weekdayLabel(modelData)
-                    color: Qt.darker(root.contentForeground, 1.5)
-                    font.family: root.contentFontFamily
+                    color: Anatomy.muted
+                    font.family: Anatomy.mono
                     font.pixelSize: Style.font.caption
-                    font.letterSpacing: 1
-                    font.bold: true
+                    font.weight: Font.DemiBold
+                    font.letterSpacing: Anatomy.labelSpacing
                   }
                 }
               }
@@ -653,8 +654,8 @@ Panel {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     text: modelData.week
-                    color: Qt.darker(root.contentForeground, 1.9)
-                    font.family: root.contentFontFamily
+                    color: Anatomy.lo
+                    font.family: Anatomy.mono
                     font.pixelSize: Style.font.caption
                   }
 
@@ -671,23 +672,22 @@ Panel {
 
                       width: root.cellWidth
                       height: root.cellHeight
-                      radius: Style.cornerRadius
-                      // Today is outlined, not filled: a lit-up block shouts
-                      // over a grid this quiet.
-                      color: "transparent"
-                      border.width: modelData.today ? Style.spacing.hairline : 0
-                      border.color: Style.normalBorderFor(root.contentForeground, Commons.Color.accent)
+                      radius: Anatomy.chipRadius
+                      // anatomy (.cal .t): today is the one solid cell, strong
+                      // fill with page-dark digits; everything else is text.
+                      color: modelData.today ? Anatomy.strong : "transparent"
 
                       Text {
                         textFormat: Text.PlainText
                         anchors.centerIn: parent
                         text: modelData.day
-                        color: modelData.inMonth
-                          ? (modelData.weekend ? Qt.darker(root.contentForeground, 1.45) : root.contentForeground)
-                          : Qt.darker(root.contentForeground, 2.2)
-                        font.family: root.contentFontFamily
+                        color: modelData.today ? Anatomy.page
+                          : modelData.inMonth
+                            ? (modelData.weekend ? Anatomy.muted : Anatomy.text)
+                            : Anatomy.lo
+                        font.family: Anatomy.mono
                         font.pixelSize: Style.font.body
-                        font.bold: modelData.today
+                        font.weight: modelData.today ? Font.Bold : Font.Normal
                       }
                     }
                   }
@@ -700,10 +700,9 @@ Panel {
             Rectangle {
               x: gridColumn.x + root.weekColumnWidth + root.cellSpacing + Math.round((root.gutterWidth - width) / 2)
               y: gridColumn.y + headerRow.height + gridColumn.spacing
-              width: Style.spacing.hairline
+              width: 1
               height: gridColumn.height - headerRow.height - gridColumn.spacing
-              color: root.contentForeground
-              opacity: 0.1
+              color: Anatomy.rule
             }
           }
 
@@ -733,10 +732,11 @@ Panel {
                 width: Style.space(130)
                 horizontalAlignment: Text.AlignHCenter
                 text: root.viewDate.toLocaleDateString(root.labelLocale, "MMMM yyyy").toUpperCase()
-                color: Qt.darker(root.contentForeground, 1.4)
-                font.family: root.contentFontFamily
-                font.pixelSize: Style.font.body
-                font.letterSpacing: 1
+                color: Anatomy.strong
+                font.family: Anatomy.mono
+                font.pixelSize: Style.font.bodySmall
+                font.weight: Font.DemiBold
+                font.letterSpacing: Anatomy.labelSpacing
               }
 
               PanelActionButton {
@@ -745,22 +745,45 @@ Panel {
                 anchors.left: parent.left
                 anchors.leftMargin: -Style.space(8)
                 anchors.verticalCenter: parent.verticalCenter
-                iconText: "󰅁"
-                tooltipText: root.tr("Mês anterior")
-                foreground: root.contentForeground
-                fontFamily: root.contentFontFamily
+                tooltipText: Strings.T("Mês anterior  [")
                 onClicked: root.moveMonth(-1)
+
+                AnatomyIcon {
+                  anchors.centerIn: parent
+                  path: Anatomy.icons.chevronLeft
+                  size: Style.font.subtitle
+                  color: Anatomy.hi
+                }
+              }
+
+              // Way home once the view has stepped away from this month.
+              Button {
+                visible: !root.viewingCurrentMonth
+                anchors.right: nextMonthButton.left
+                anchors.rightMargin: Style.space(4)
+                anchors.verticalCenter: parent.verticalCenter
+                text: Strings.T("Hoje")
+                tooltipText: Strings.T("Voltar para hoje  (T)")
+                fontSize: Style.font.bodySmall
+                horizontalPadding: Style.spacing.lg
+                verticalPadding: Style.spacing.xs
+                onClicked: root.goToToday()
               }
 
               PanelActionButton {
+                id: nextMonthButton
                 anchors.right: parent.right
                 anchors.rightMargin: -Style.space(8)
                 anchors.verticalCenter: parent.verticalCenter
-                iconText: "󰅂"
-                tooltipText: root.tr("Próximo mês")
-                foreground: root.contentForeground
-                fontFamily: root.contentFontFamily
+                tooltipText: Strings.T("Próximo mês  ]")
                 onClicked: root.moveMonth(1)
+
+                AnatomyIcon {
+                  anchors.centerIn: parent
+                  path: Anatomy.icons.chevronRight
+                  size: Style.font.subtitle
+                  color: Anatomy.hi
+                }
               }
             }
           }

@@ -19,7 +19,7 @@ Quiet date, bright time, and every minute flips in.
   (`THU 29 OCT`); the time stays bright. Digits never shift sideways.
 - 🌍 **Your language.** Day and month names follow the system locale, without the
   trailing dots some locales add (`qui.` → `QUI`).
-- 📅 **Omarchy's full calendar panel** on click: month view with week numbers,
+- 📅 **Omarchy's full calendar panel, in the Island look**, on click: month view with week numbers,
   week-start toggle and the life-progress bar. Right-click cycles the label
   formats. It is the official clock underneath.
 - 🔄 **Drop-in replacement** for the built-in clock: enabling it swaps Omarchy's
@@ -28,10 +28,13 @@ Quiet date, bright time, and every minute flips in.
 ## Install
 
 ```bash
+omarchy plugin add https://github.com/hugorolimf/omarchy-island-kit --enable
 omarchy plugin add https://github.com/hugorolimf/omarchy-clock --enable
 ```
 
-Works with Omarchy's own bar and with Island Bar (coming soon).
+The calendar panel is drawn with [Island Kit](https://github.com/hugorolimf/omarchy-island-kit) (install it first, or install the clock from the Kit's catalog).
+
+Works with Omarchy's own bar and with [Island Bar](https://github.com/hugorolimf/omarchy-bar).
 
 ## Requirements
 
