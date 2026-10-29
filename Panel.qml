@@ -379,6 +379,7 @@ Panel {
                 spacing: Style.space(10)
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.verticalCenter: parent.verticalCenter
                   text: Strings.T("NASCIMENTO")
                   color: Anatomy.muted
@@ -401,6 +402,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.verticalCenter: parent.verticalCenter
                   anchors.verticalCenterOffset: 0
                   leftPadding: Style.space(6)
@@ -492,6 +494,7 @@ Panel {
 
               Text {
                 id: lifeLabel
+                textFormat: Text.PlainText
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: Strings.T("VIDA")
@@ -591,6 +594,7 @@ Panel {
                   color: weekStartMouse.containsMouse ? Anatomy.hover : "transparent"
 
                   Text {
+                    textFormat: Text.PlainText
                     anchors.centerIn: parent
                     text: Strings.T("S")
                     color: weekStartMouse.containsMouse ? Anatomy.strong : Anatomy.lo

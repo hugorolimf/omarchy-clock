@@ -198,6 +198,7 @@ BarWidget {
       spacing: 7
       transform: Translate { id: flipShift }
       Text {
+        textFormat: Text.PlainText
         visible: text !== ""
         anchors.baseline: timeText.baseline
         text: root.shownParts.date
@@ -208,6 +209,7 @@ BarWidget {
       }
       Text {
         id: timeText
+        textFormat: Text.PlainText
         text: root.shownParts.time
         color: button.foreground
         font.family: "JetBrainsMono Nerd Font"
