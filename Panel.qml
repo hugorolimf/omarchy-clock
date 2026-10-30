@@ -239,6 +239,10 @@ Panel {
     }
   }
 
+  // the panel's height follows its content smoothly while open (a month with one more week)
+  property real panelHeight: calendarColumn.implicitHeight
+  Behavior on panelHeight { enabled: root.opened; NumberAnimation { duration: 280; easing.type: Easing.Bezier; easing.bezierCurve: Anatomy.ease } }
+
   KeyboardPanel {
     id: panel
     anchorItem: root.anchorItem
@@ -247,7 +251,7 @@ Panel {
     open: root.opened
     focusTarget: keyCatcher
     contentWidth: panel.fittedContentWidth(Style.space(560))
-    contentHeight: panel.fittedContentHeight(calendarColumn.implicitHeight)
+    contentHeight: panel.fittedContentHeight(root.panelHeight)
 
     PanelKeyCatcher {
       id: keyCatcher

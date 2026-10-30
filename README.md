@@ -39,6 +39,10 @@ Works with Omarchy's own bar and with [Island Bar](https://github.com/hugorolimf
 ## Requirements
 
 - Omarchy with the Quattro shell (Quickshell).
+- [Island Kit](https://github.com/hugorolimf/omarchy-island-kit): the calendar panel is drawn with it.
+  Without it, the plugin shows an "Install Island Kit" button on the bar (in
+  Portuguese, "Instale o Island Kit"); clicking it installs the Kit and restarts
+  the shell.
 - The JetBrainsMono Nerd Font that Omarchy ships.
 
 It writes no files of its own; formats and week start are kept where Omarchy's
