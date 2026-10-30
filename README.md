@@ -63,7 +63,7 @@ this plugin's.
 
 [Glass Dock](https://github.com/hugorolimf/omarchy-dock) ·
 [Glass Alt+Tab](https://github.com/hugorolimf/omarchy-alttab) ·
-[Glass Notifications](https://github.com/hugorolimf/omarchy-notifications)
+[Island Notch](https://github.com/hugorolimf/omarchy-island-notch)
 
 ## License
 
