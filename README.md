@@ -25,6 +25,16 @@ Quiet date, bright time, and every minute flips in.
 - 🔄 **Drop-in replacement** for the built-in clock: enabling it swaps Omarchy's
   clock out of the bar; disabling it puts the original back.
 
+## See it
+
+Recorded on a real desktop, mouse and clicks included; this take is in Portuguese.
+
+**The calendar** (with [Island Kit](https://github.com/hugorolimf/omarchy-island-kit)): a
+click on the clock opens it, with the year's progress and week numbers; the arrows walk
+through the months.
+
+![Calendar](assets/calendar.gif)
+
 ## Install
 
 ```bash
